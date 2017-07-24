@@ -1,0 +1,422 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="CS 498 Data Visualization Final Project Slide 4">
+    <meta name="author" content="Nischol Antao">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>CS498 Data Visualization Final Project Slide 4</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" 
+	crossorigin="anonymous">
+    <!-- Bootstrap theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" 
+	integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" 
+	crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="Slide4.css" rel="stylesheet"> 
+
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" 
+		  data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" >CS498 Final Project</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+			<li class="pagelinks"><a href="Introduction.html">Introduction</a></li>
+            <li class="pagelinks"><a href="Slide1.html">Slide 1</a></li>
+            <li class="pagelinks"><a href="Slide2.html">Slide 2</a></li>
+            <li class="pagelinks"><a href="Slide3.html">Slide 3</a></li>
+			<li class="pagelinks"><a href="Slide4.html">Slide 4</a></li>
+			<li class="pagelinks"><a href="Slide5.html">Slide 5</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+<div class="container theme-showcase" role="main"> 
+
+      
+	  <div class="page-header"></div>
+      
+	  
+	  <div class="page-header">
+        <h1>Country Impact (2015)</h1>
+      </div>
+		<p> In 2015, the highest concentration of Malaria cases and deaths were reported in Africa, 
+		and this was followed by South East Asia. When looking at a Country based break down of 
+		Malaria cases, and deaths, we see that 13 countries reported 76% of the Malaria cases World wide
+		and 72% of the Malaria Deaths World wide. Of these countries, in Africa, Nigeria reported 29% of the Word wide cases,
+		and 26% of the World wide Deaths. In South East Asia, India reported 6% of the World wide cases, and
+		6% of the World wide Deaths. 
+		</p>
+		<p> Use the User Input buttons below to view the 2015 Malaria Cases by Country, or the 2015
+		Malaria Deaths by Country, in the Visualization. </p>
+
+		<div class="page-header">
+			<form>
+				<label><input type="button" name="dataset" class="btn btn-primary" value="2015 Malaria Cases By Country"> </label>
+				<label><input type="button" name="dataset" class="btn btn-danger" value="2015 Malaria Deaths by Country"> </label>
+			</form>
+		</div>	
+
+		<div class = "container" id = "donutgraph"></div>
+
+		
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+
+			<script type="text/javascript">
+
+			var width = 900,
+				height = 500,
+				radius = Math.min(width, height) / 2;
+			
+			//Create our svg canvas
+
+			var svg = d3.select("body").select("#donutgraph")
+				.append("svg")
+				.attr("width", width)
+				.attr("height", height)
+				.append("g");
+
+			// Add groups for for each one of our pie slices, labels and annotation lines
+			// We want that DOM looking pretty
+				
+			svg.append("g")
+				.attr("class", "slices");
+			svg.append("g")
+				.attr("class", "labelName");
+			svg.append("g")
+				.attr("class", "labelValue");
+			svg.append("g")
+				.attr("class", "lines");
+
+			// Handy d3 function for computing our arcs
+
+			var pie = d3.layout.pie()
+				.sort(null)
+				.value(function(d) {
+					return d.value;
+				});
+
+			// Define the outer and inner radii of our donut based on the minimum coordinate of the
+			// SVG canvas (width/height)
+				
+			var arc = d3.svg.arc()
+				.outerRadius(radius * 0.8)
+				.innerRadius(radius * 0.55);
+
+			var outerArc = d3.svg.arc()
+				.innerRadius(radius * 1)
+				.outerRadius(radius * 1);
+
+
+			svg.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+			// Use an ordinal color scale provided by d3
+			
+			var colorRange = d3.scale.category20c();
+			var color = d3.scale.ordinal()
+				.range(colorRange.range());
+
+			// Define  our tool tip
+				
+			var div = d3.select("body").append("div").attr("class", "toolTip");
+
+			//Data 
+			
+			CasesByCountry = [
+					{label:"Nigeria", value:29}, 
+					{label:"D.R Congo", value:9}, 
+					{label:"India", value:6},
+					{label:"Mozambique", value:4},
+					{label:"Mali", value:4},
+					{label:"Uganda", value:4},
+					{label:"Ivory Coast", value:4},
+					{label:"Ghana", value:3},
+					{label:"Burkina Faso", value:3},
+					{label:"Kenya", value:3},
+					{label:"Cameroon", value:3},
+					{label:"Tanzania", value:3},
+					{label:"Niger", value:2},
+					{label:"Others", value:24}
+					];
+
+			DeathsByCountry = [
+					{label:"Nigeria", value:26}, 
+					{label:"D.R Congo", value:10}, 
+					{label:"India", value:6},
+					{label:"Mali", value:5},
+					{label:"Tanzania", value:4},
+					{label:"Mozambique", value:4},
+					{label:"Ivory Coast", value:3},
+					{label:"Uganda", value:3},
+					{label:"Ghana", value:3},
+					{label:"Burkina Faso", value:3},
+					{label:"Cameroon", value:3},
+					{label:"Kenya", value:3},	
+					{label:"Niger", value:2},
+					{label:"Others", value:28}
+					];
+
+			// We show Cases Data by default		
+					
+			change(CasesByCountry);
+
+			// Based on user button clicks change the dataset. 
+			// Its easier to embed the data set in the data for this example, than to switch reading
+			// a csv
+
+			d3.selectAll("input")
+				.on("click", selectDataset);
+				
+			// Switch between data sets based on user selection	
+				
+			function selectDataset()
+			{
+				var value = this.value;
+				if (value == "2015 Malaria Cases By Country")
+				{
+					change(CasesByCountry);
+				}
+				else
+				{
+					change(DeathsByCountry);
+				}
+
+			}
+
+			function change(data) {
+
+				//  Do a data join so we can draw our donut/pue and pick out our labels for each slice
+				
+				var slice = svg.select(".slices").selectAll("path.slice")
+					.data(pie(data), function(d){ return d.data.label });
+
+				// The color of each slice is an ordinal selection	
+					
+				slice.enter()
+					.insert("path")
+					.style("fill", function(d) { return color(d.data.label); })
+					.attr("class", "slice");
+
+				// 	Add a transition based on the user selection
+				// So that the arc sizes are transitioned properly on input selection
+					
+				slice
+					.transition().duration(1500)
+					.attrTween("d", function(d) {
+						this._current = this._current || d;
+						var interpolate = d3.interpolate(this._current, d);
+						this._current = interpolate(0);
+						return function(t) {
+							return arc(interpolate(t));
+						};
+					})
+				
+				// We need to annorate each slice when a user mouses over it
+					
+				slice
+					.on("mousemove", function(d){
+												
+						div.style("left", d3.event.pageX+10+"px");
+						div.style("top", d3.event.pageY-25+"px");
+						div.style("display", "inline-block");
+						div.html((d.data.label)+"<br>"+(d.data.value)+"%");
+					});
+				slice
+					.on("mouseout", function(d){
+					
+
+						div.style("display", "none");
+					});
+
+				slice.exit()
+					.remove();
+
+				// Label Each Country with its name and data point
+
+				var text = svg.select(".labelName").selectAll("text")
+					.data(pie(data), function(d){ return d.data.label });
+
+				text.enter()
+					.append("text")
+					.attr("dy", ".35em")
+					.text(function(d) {
+						return (d.data.label+": "+d.value+"%");
+					});
+
+				// Some of d3s behind the scenes magic to give use the angle we need to draw each
+				// poly line from
+				
+				function midAngle(d){
+					
+					return d.startAngle + (d.endAngle - d.startAngle)/2;
+				}
+
+				// Transition the text at the same rate as the donut chart
+				// Some d3 black magic here from bl.ocks.org. 
+				
+				text
+					.transition().duration(1500)
+					.attrTween("transform", function(d) {
+						this._current = this._current || d;
+						var interpolate = d3.interpolate(this._current, d);
+						this._current = interpolate(0);
+						return function(t) {
+							var d2 = interpolate(t);
+							var pos = outerArc.centroid(d2);
+							pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+							return "translate("+ pos +")";
+						};
+					})
+					.styleTween("text-anchor", function(d){
+						this._current = this._current || d;
+						var interpolate = d3.interpolate(this._current, d);
+						this._current = interpolate(0);
+						return function(t) {
+							var d2 = interpolate(t);
+							return midAngle(d2) < Math.PI ? "start":"end";
+						};
+					})
+					.text(function(d) {
+						return (d.data.label+": "+d.value+"%");
+					});
+
+
+				text.exit()
+					.remove();
+
+				// Define lines coming from the Centroid of the arcs to meet the text, so that
+				// it is properly annotated. 
+
+				var polyline = svg.select(".lines").selectAll("polyline")
+					.data(pie(data), function(d){ return d.data.label });
+
+				polyline.enter()
+					.append("polyline");
+				
+				// More d3 black magic to transition the poly lines
+					
+				polyline.transition().duration(1500)
+					.attrTween("points", function(d){
+						this._current = this._current || d;
+						var interpolate = d3.interpolate(this._current, d);
+						this._current = interpolate(0);
+						return function(t) {
+							var d2 = interpolate(t);
+							var pos = outerArc.centroid(d2);
+							pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+							return [arc.centroid(d2), outerArc.centroid(d2), pos];
+						};
+					});
+
+				polyline.exit()
+					.remove();
+
+					
+			};
+
+			</script>
+		
+
+		
+		
+
+
+</div> <!-- Container -->
+	  
+	
+		
+	
+
+
+	 
+	<div class = "container">
+	 <div class="page-header">
+        <h3>About the Visualization</h3>
+      </div>
+      <div class="well">
+        <p> This Visualization follows the Interactive Slide show hybrid structure. Slide 4 depicts a
+		<b>Scene </b> that conveys to the user, the impact of Malaria on various Countries of the World. 
+		The Visualization in this scene is a donut chart, where each country is 
+		represented by a slice. The chart shows the top 13 countries, in terms of Malaria incidences
+		and fatalities. The remainder of the countries are grouped in a slice labeled 'Other'. 
+		The area of each slice is proportional to either the number of
+		cases of malaria reported in the Country, or the Number of Deaths caused by Malaria in the Country,
+		depending on the users selection of whether to view a graph of the Cases, or a graph of the 
+		Deaths. The <b> Triggers </b> in this Visualization include the Users selection of a button 
+		that determines whether they want to view a graph of the Malaria Cases by Country, or a graph of Malaria Deaths
+		by Country. This selection drives a  <b> Parameter </b> that transitions between the two datasets, 
+		and animates the Visualization to display the graph that the user wishes to see. Additional <b>
+		Triggers </b> in this scene include Mouse Over and Mouse Out events. When  a user Mouses over
+		a slice on the graph, it displays a Tool Tip <b> Annotation </b> , that shows the Country selected and the percentage of 
+		world wide Malaria cases/deaths attributed to the country that was moused over. It also changes the opacity of the slice that 
+		was moused over. Each Slice in the Graph is also <b> Annotated </b> to show
+		the Country that the Slice corresponds to, and its percentage of World Wide Malaria cases/deaths 
+		, based on the user's selection of whether to view Cases/Deaths. Additional <b> Parameters </b> 
+		in this Interactive Slide show are defined by the Slide Numbers that the User can click on, 
+		to advance the presentation. These are provided both in a navigation bar at the top of the page, 
+		and as Navigation buttons at the bottom of the page. These Parameters determine which slide 
+		is displayed to the user. The user can Trigger a change in the scenes contained within the Slide 
+		show, by modifying these Parameters. 
+		</p>
+      </div>
+	</div>
+
+      <div class="container">
+	    <div class="col-lg-1 text-center" >
+        <a href="Slide3.html">
+        <button type="button" class="btn btn-default btn-lg ">
+        <span class="glyphicon glyphicon-menu-left" aria-hidden="true">Slide 3</span> 
+        </button></a>
+        </div>
+		
+		<div class="col-lg-11 text-center" >
+        <a href="Slide5.html">
+        <button type="button" class="btn btn-default btn-lg ">Slide 5
+        <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> 
+        </button></a>
+        </div>
+
+		
+      </div>
+
+
+
+    
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" 
+	crossorigin="anonymous"></script>
+	<!-- <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    
+    <script src="../../assets/js/docs.min.js"></script> -->
+  </body>
+</html>

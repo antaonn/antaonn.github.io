@@ -1,0 +1,328 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="CS 498 Data Visualization Final Project Slide 5">
+    <meta name="author" content="Nischol Antao">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>CS498 Data Visualization Final Project Slide 5</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" 
+	crossorigin="anonymous">
+    <!-- Bootstrap theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" 
+	integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" 
+	crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="Slide5.css" rel="stylesheet"> 
+
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" 
+		  data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" >CS498 Final Project</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+			<li class="pagelinks"><a href="Introduction.html">Introduction</a></li>
+            <li class="pagelinks"><a href="Slide1.html">Slide 1</a></li>
+            <li class="pagelinks"><a href="Slide2.html">Slide 2</a></li>
+            <li class="pagelinks"><a href="Slide3.html">Slide 3</a></li>
+			<li class="pagelinks"><a href="Slide4.html">Slide 4</a></li>
+			<li class="pagelinks"><a href="Slide5.html">Slide 5</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+<div class="container theme-showcase" role="main"> 
+
+      
+	  <div class="page-header"></div>
+      
+	  
+	  <div class="page-header">
+        <h1>Age Group Impact (2010-2015)</h1>
+      </div>
+		<p>
+		In 2015, Malaria was responsible for 303,000 deaths, in Children Under the Age of 5. This is
+		significantly higher than the number of deaths in the Over 5 age group (126,000). Malaria was
+		responsible for 70% of the Deaths in Chidren Under the Age of 5, World wide.  </p>
+
+
+	  <p> The number of Deaths caused by Malaria in persons above the age
+		of 5 stayed fairly steady between 2010 and 2015 (On Average 123,500). 
+		However the number of Deaths caused by Malaria, in Children Under the Age of 5, decreased 
+		by 29% during that time span. </p>
+
+	  <p> Hover over a bar in the chart, to see the number of Deaths associated with that specific 
+	  group </p>
+
+		<div class = "container" id = "stackedbargraph"></div>
+
+		
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+
+		<script type="text/javascript">
+		
+		// D3 Margin Convention, seems like a little overkill at first, but makes a lot of sense				
+		// Allows you to use the rest of your code in terms of width and height
+
+		var margin = {top: 100, right: 200, bottom: 35, left: 80};
+
+		var svgwidth = 900;
+		var svgheight = 500;
+		
+		var width = svgwidth - margin.left - margin.right,
+			height = svgheight - margin.top - margin.bottom;
+
+		var svg = d3.select("body").select("#stackedbargraph")
+		  .append("svg")
+		  .attr("width", svgwidth)
+		  .attr("height", svgheight)
+		  .append("g")
+		  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+		// Small Data set so embedding it in the data itself. As opposed to a csv
+
+		var data = [
+		  { year: "2010", Over5: 126000, Under5: 428000},
+		  { year: "2011", Over5: 124000, Under5: 387000},
+		  { year: "2012", Over5: 123000, Under5: 351000},
+		  { year: "2013", Over5: 122000, Under5: 330000},
+		  { year: "2014", Over5: 120000, Under5: 315000},
+		  { year: "2015", Over5: 126000, Under5: 303000},
+
+		];
+
+		// Switch to Year format for the time axis. 
+		
+		var parse = d3.time.format("%Y").parse;
+		
+		// Switch back to Year Text format for the Tool tip
+		
+		var revparse = d3.time.format("%Y");
+
+		// Tool Tip
+		
+		var div = d3.select("body").append("div").attr("class", "toolTip");
+
+		// Stack the Data in layers. 
+		
+		var dataset = d3.layout.stack()(["Over5", "Under5"].map(function(morte) {
+		  return data.map(function(d) {
+			return {x: parse(d.year), y: d[morte]};
+		  });
+		}));
+
+
+		// Define X scale
+		
+		var x = d3.scale.ordinal()
+		  .domain(dataset[0].map(function(d) { return d.x; }))
+		  .rangeRoundBands([20, width-20], 0.1);
+
+		// Define Y scale to be the maximum of the sum of the 2 stacked bars. 
+		
+		var y = d3.scale.linear()
+		  .domain([0, d3.max(dataset, function(d) {  return d3.max(d, function(d) { return d.y0 + d.y; });  })])
+		  .range([height, 0]);
+
+		// Color of our bars
+		
+		var colors = ["#FCC00D", "29AEE4"];
+
+
+		// Define and render the axes
+		// Label the axes as well 
+		
+		var yAxis = d3.svg.axis()
+		  .scale(y)
+		  .orient("left")
+		  .ticks(5)
+		  .tickSize(-width, 0, 0)
+		  .tickFormat( function(d) { return d ;} );
+
+		var xAxis = d3.svg.axis()
+		  .scale(x)
+		  .orient("bottom")
+		  .tickFormat(d3.time.format("%Y"));
+
+		svg.append("g")
+		  .attr("class", "y axis")
+		  .call(yAxis)
+		  .append("text")
+		  .attr("class", "axis-title")
+          .attr("transform", "rotate(-90)")
+          .attr("y", -1*(margin.left -15))
+		  .attr("x", -1 *(height/2 - 75))
+          .attr("dy", ".35em")
+          .style("text-anchor", "end")
+          .text("Global Malaria Deaths");
+
+
+		svg.append("g")
+		  .attr("class", "x axis")
+		  .attr("transform", "translate(0," + height + ")")
+		  .call(xAxis)
+		  .append("text")
+		  .attr("class", "axis-title")
+		  .attr("x", width/2 - 10)
+		  .attr("y", margin.bottom-10)
+		  .attr("dy", ".71em")
+		  .style("text-anchor", "right")
+		  .text("Year");
+
+		// Create groups for each series
+		
+		var groups = svg.selectAll("g.yearlydeaths")
+		  .data(dataset)
+		  .enter().append("g")
+		  .attr("class", "yearlydeaths")
+		  .style("fill", function(d, i) { return colors[i]; });
+
+		// Create rect elements for each bar we need to draw
+		
+		  
+		var rect = groups.selectAll("rect")
+		  .data(function(d) { return d; })
+		  .enter()
+		  .append("rect")
+		  .attr("x", function(d) { return x(d.x); })
+		  .attr("y", function(d) { return y(d.y0 + d.y); })
+		  .attr("height", function(d) { return y(d.y0) - y(d.y0 + d.y); })
+		  .attr("width", x.rangeBand())
+
+		// Add transitions 
+		  
+	      .on("mouseout", function(d){
+			div.style("display", "none");})
+		  .on("mousemove", function(d){
+			div.style("left", d3.event.pageX+10+"px");
+			div.style("top", d3.event.pageY-25+"px");
+			div.style("display", "inline-block");
+			div.html(revparse(d.x)+"<br>" + "Deaths:"+"<br>"+(d.y));
+
+		
+		  });
+
+
+		// Add a legend
+		
+		var legend = svg.selectAll(".legend")
+		  .data(colors)
+		  .enter().append("g")
+		  .attr("class", "legend")
+		  .attr("transform", function(d, i) { return "translate(30," + i * 19 + ")"; });
+		 
+		legend.append("rect")
+		  .attr("x", width - 18)
+		  .attr("width", 18)
+		  .attr("height", 18)
+		  .style("fill", function(d, i) {return colors.slice().reverse()[i];});
+		 
+		legend.append("text")
+		  .attr("x", width + 5)
+		  .attr("y", 9)
+		  .attr("dy", ".35em")
+		  .style("text-anchor", "start")
+		  .text(function(d, i) { 
+			switch (i) {
+			  case 0: return "Global Malaria Deaths < Age 5";
+			  case 1: return "Global Malaria Deaths > Age 5";
+			}
+		  });
+
+
+
+		</script>
+		
+
+		
+		
+
+
+</div> <!-- Container -->
+	  
+	
+		
+	
+
+
+	 
+	<div class = "container">
+	 <div class="page-header">
+        <h3>About the Visualization</h3>
+      </div>
+      <div class="well">
+        <p> This Visualization follows the Interactive Slide show hybrid structure. Slide 5 depicts a
+		<b>Scene </b> that conveys to the user, the impact of Malaria, in terms of number of deaths caused, 
+		in 2 distinct age groups, between 2010 and 2015 . The Age groups depicted in this Visualization are the
+		Above 5 age group and the Under 5 Age group. The Chart in this scene is a stacked bar graph, 
+		where the Above 5 age group is shown in the lower set of bars, and the Under 5 age group is shown 
+		in the upper set of bars. The <b> Triggers </b> in this Visualization include Mouse Over and Mouse
+		Out Events. Mousing Over a bar, triggers a <b> Parameter </b> that <b> Annotates </b> the Graph with
+		the number of Malaria related deaths, corresponding to that Bar. It also changes the opacity of the
+		bar that is moused over. Additional <b> Annotations </b> in this graph include a legend showing
+		which colored bars, correspond to which age group, and the associated axes of the bar graph. 
+		Additional <b> Parameters </b> 
+		in this Interactive Slide show are defined by the Slide Numbers that the User can click on, 
+		to advance the presentation. These are provided both in a navigation bar at the top of the page, 
+		and as Navigation buttons at the bottom of the page. These Parameters determine which slide 
+		is displayed to the user. The user can Trigger a change in the scenes contained within the Slide 
+		show, by modifying these Parameters. 
+		</p>
+      </div>
+	</div>
+
+      <div class="container">
+	    <div class="col-lg-1 text-center" >
+        <a href="Slide4.html">
+        <button type="button" class="btn btn-default btn-lg ">
+        <span class="glyphicon glyphicon-menu-left" aria-hidden="true">Slide 4</span> 
+        </button></a>
+        </div>
+		
+
+
+		
+      </div>
+
+
+
+    
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" 
+	crossorigin="anonymous"></script>
+	<!-- <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    
+    <script src="../../assets/js/docs.min.js"></script> -->
+  </body>
+</html>

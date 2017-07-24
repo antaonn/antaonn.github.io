@@ -1,0 +1,98 @@
+/*!
+ * Slide 1 css 
+ * Line Graphs
+ */
+
+
+
+
+
+.axis path,
+.axis line {
+  font: 12px sans-serif;
+  fill: none;
+  stroke: #D4D8DA;
+  stroke-width: 1px;
+  shape-rendering: crispEdges;
+}
+
+.line2 {
+  fill: none;
+  stroke: #ff2727;
+  stroke-width: 5px;
+}
+
+.line {
+  fill: none;
+  stroke: #3072ff;
+  stroke-width: 5px;
+}
+
+
+.overlay {
+  fill: none;
+  pointer-events: visible;
+}
+
+.overlay2 {
+  fill: none;
+  pointer-events: visible;
+}
+
+.focus circle {
+  fill: #3072ff;
+  stroke: #3072ff;
+  stroke-width: 5px;
+}
+
+.focus2 circle {
+  fill: #ff2727;
+  stroke: #ff2727;
+  stroke-width: 5px;
+}
+
+  
+.hover-line {
+  stroke: #3072ff;
+  stroke-width: 2px;
+  stroke-dasharray: 1,1;
+}
+  
+.hover-line2 {
+  stroke: #ff2727;
+  stroke-width: 2px;
+  stroke-dasharray: 1,1;
+}
+  
+#leftgraph {
+	float: left;
+    width: 800px;
+    padding: 20px;
+}		
+#rightgraph{
+	float: left;
+    width: 800px;
+	padding: 20px;	
+}		
+
+
+
+#CasesCircle{
+  stroke: #3072ff;
+  fill: white;
+  stroke-width: 2px;
+  stroke-dasharray: 4,4;
+}
+
+#DeathsCircle{
+  stroke: #ff2727;
+  fill: white;
+  stroke-width: 2px;
+  stroke-dasharray: 4,4;
+}
+
+#CircleText{
+
+	font: 14px sans-serif;
+
+}

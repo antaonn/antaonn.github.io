@@ -1,0 +1,364 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="CS 498 Data Visualization Final Project Slide 2">
+    <meta name="author" content="Nischol Antao">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>CS498 Data Visualization Final Project Slide 2</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" 
+	crossorigin="anonymous">
+    <!-- Bootstrap theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" 
+	integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" 
+	crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" href="Slide2.css"> 
+
+	
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" 
+		  data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" >CS498 Final Project</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+			<li class="pagelinks"><a href="Introduction.html">Introduction</a></li>
+            <li class="pagelinks"><a href="Slide1.html">Slide 1</a></li>
+            <li class="pagelinks"><a href="Slide2.html">Slide 2</a></li>
+            <li class="pagelinks"><a href="Slide3.html">Slide 3</a></li>
+			<li class="pagelinks"><a href="Slide4.html">Slide 4</a></li>
+			<li class="pagelinks"><a href="Slide5.html">Slide 5</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+<div class="container theme-showcase" role="main"> 
+
+      
+	  <div class="page-header"></div>
+      
+	  
+	  <div class="page-header">
+        <h1>Regional Impact (2015)</h1>
+      </div>
+		<p> In 2015, the most cases of Malaria were reported in the WHO Africa Region (92%). This  
+		was followed by the WHO South East Asia Region (6%), and the Eastern Mediterranean Region 
+		(1.7%). There were a total of 191 Million cases Malaria reported in the Africa region, 14.4
+		Million cases reported in the South East Asia Region, 3.8 Million Cases reported in the 
+		Eastern Mediterranean Region, 1.2 Million cases reported in the Western Pacific Region, and
+		0.8 Million Cases reported in the Americas region. No cases were reported in the European
+		region. </p>
+		<p> In 2015 Malaria was responsible for 394,000 deaths in Africa, 26200 deaths in South East
+		Asia, 7300 deaths in the Eastern Mediterranean Region, 1500 Deaths in the Western Pacific Region,
+		and 490 deaths in the Americas. Roughly 90% of the Deaths caused by Malaria occurred in Africa,
+		7% of the Deaths caused by Malaria occurred in South East Asia, and 2% of the Deaths caused
+		by Malaria occurred in the Eastern Mediterranean Region.</p>
+		
+		<p> Use the User Input buttons below to view the 2015 Malaria Cases by Region, or the 2015
+		Malaria Deaths by Region, in the Visualization. </p>
+		
+		<div class="page-header">
+			<form>
+				<label><input type="button" name="dataset" class="btn btn-primary" value="2015 Malaria Cases By Region (Millions)" > </label>
+				<label><input type="button" name="dataset" class="btn btn-danger" value="2015 Malaria Deaths by Region (Thousands)"> </label>
+			</form>
+		</div>	
+
+		<div class = "container" id = "circlegraph"></div>
+
+		
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+
+
+
+<script type="text/javascript">
+
+var WidthCircle =960;
+var HeightCircle = 300;
+
+// Tool Tip
+	
+var div = d3.select("body").append("div").attr("class", "toolTip");
+
+// Data
+
+var Cases = [
+	{
+		"Region": "Africa",
+		"Value": 191,
+		"Color": "crimson",
+		"Units": "Million"
+
+		
+	},
+	{
+		"Region": "S.E Asia",
+		"Value": 14.4,
+		"Color": "forestgreen",
+		"Units": "Million"
+		
+	},
+	{
+		"Region": "E.Mediterranean",
+		"Value": 3.8,
+		"Color": "cornflowerblue",
+		"Units": "Million"
+		
+		
+	},
+	{
+		"Region": "W.Pacific",
+		"Value": 1.2,
+		"Color": "gold",
+		"Units": "Million"
+		
+		
+	},
+	{
+		"Region": "Americas",
+		"Value": 0.8,
+		"Color": "lightsalmon",
+		"Units": "Million"
+		
+		
+	},
+		
+	];
+
+var Deaths = [
+	{
+		"Region": "Africa",
+		"Value": 394,
+		"Color": "crimson",
+		"Units": "Thousand"
+		
+	},
+	{
+		"Region": "S.E Asia",
+		"Value": 26.2,
+		"Color": "forestgreen",
+		"Units": "Thousand"
+		
+	},
+	{
+		"Region": "E.Mediterranean",
+		"Value": 7.3,
+		"Color": "cornflowerblue",
+		"Units": "Thousand"
+		
+		
+	},
+	{
+		"Region": "W.Pacific",
+		"Value": 1.5,
+		"Color": "gold",
+		"Units": "Thousand"
+		
+		
+	},
+	{
+		"Region": "Americas",
+		"Value": 0.49,
+		"Color": "lightsalmon",
+		"Units": "Thousand"
+		
+		
+	},
+		
+	];
+
+// We default to showing cases data, if the user select deaths, we show that data insteaed	
+	
+CreateCircleChartViz(Cases);
+
+// User click on input button updates the data
+	
+d3.selectAll("input")
+	.on("click", SelectCircleChartData);
+
+// Define which chart to draw	
+	
+function SelectCircleChartData()
+	{
+		var value = this.value;
+		if (value == "2015 Malaria Cases By Region (Millions)")
+		{
+			CreateCircleChartViz(Cases);
+			
+			
+		}
+		else
+		{
+			CreateCircleChartViz(Deaths);
+			
+		}
+		
+		
+		
+	};
+	
+	
+function CreateCircleChartViz(data)
+{
+
+	// Find out the total, so we can draw the area of circles proportionally
+
+	var sum = d3.sum(data, function(d){return +d.Value;})
+
+	// Sneaky way to do a transition without D3 transition function
+	
+	d3.select("body").selectAll("svg").remove();
+	
+	// Draw our SVG circles
+	
+	var svg = d3.select("body").select("#circlegraph").append("svg")
+		.attr("width", WidthCircle)
+		.attr("height", HeightCircle);		
+	
+	var g = svg.append("g")
+	
+	var circle = g.selectAll("circle")
+		.data(data)
+		.enter()
+		.append("circle")
+		.attr("class", "circlechart");
+		
+	// Position them such that they wont overlap on the x axis, and they are midway through the y
+	// The radius is proportional to the data	
+		
+	circle.attr("cx", function(d, i) {return (i-2)*(WidthCircle/data.length) + WidthCircle/2;})
+		.attr("cy", HeightCircle/2)
+		.attr("r", function(d,i) {return (d.Value/sum) * (WidthCircle/(data.length*2)) * (5*i+1) ; })
+		.attr("fill", function(d) {return d.Color;});
+		
+	// Display a tool tip on a mouse over and remove it on a mouse out
+		
+	circle
+		.on("mousemove", function(d){
+			div.style("left", d3.event.pageX+10+"px");
+			div.style("top", d3.event.pageY-25+"px");
+			div.style("display", "inline-block");
+			div.html((d.Region)+"<br>"+(d.Value)+"<br>"+(d.Units));
+		});
+	circle
+		.on("mouseout", function(d){
+			div.style("display", "none");
+		});						
+					
+
+	// Add text to annotate each circle
+	
+	var text = svg.selectAll("text")
+		.data(data)
+		.enter()
+		.append("text")
+		.text(function(d) {return d.Region+": "+(d.Value);})
+		.attr("x", function(d, i) {return (i-2)*(WidthCircle/5) + (WidthCircle/2) - 32;})
+		.attr("y", HeightCircle/6);
+		
+
+		
+
+};
+
+</script>
+
+</div> <!-- Container -->
+	  
+	
+		
+	
+
+
+	 
+	<div class = "container">
+	 <div class="page-header">
+        <h3>About the Visualization</h3>
+      </div>
+      <div class="well">
+        <p> This Visualization follows the Interactive Slide show hybrid structure. Slide 2 depicts a
+		<b>Scene </b> that conveys to the user, the impact of Malaria on various regions of the World 
+		Population.	The World Population is divided into 6 regions, based on the World Health Organization
+		classification of Regions. These regions include Africa, South East Asia, Eastern Mediterranean, Western
+		Pacific, the Americas and Europe. The Visualization in this scene is a circle area chart, where each region is 
+		represented by a circle. The area of each circle is proportional to either the number of
+		cases of malaria reported in the Region, or the Number of Deaths caused by Malaria in the Region,
+		depending on the users selection of whether to view a graph of the Cases, or a graph of the 
+		Deaths. The <b> Triggers </b> in this Visualization include the User's selection of a button 
+		that determines whether they want to view a graph of the Malaria Cases by Region, or a graph of Malaria Deaths
+		by Region. This selection drives a  <b> Parameter </b> that transitions between the two datasets, 
+		and animates the Visualization to display the graph that the user wishes to see. Additional <b>
+		Triggers </b> in this scene include Mouse Over and Mouse Out events. When  a user Mouses over
+		a circle on the graph, it displays a Tool Tip <b> Annotation </b> , that shows the number of 
+		reported cases/deaths in a region. It also changes the opacity of the circle that is moused over.
+		Each circle in the Graph is also <b> Annotated </b> to show
+		the region that the circle corresponds to, and the number of cases/deaths in Millions/Thousands
+		, based on the user selection of whether to view Cases/Deaths. Additional <b> Parameters </b> 
+		in this Interactive Slide show are defined by the Slide Numbers that the User can click on, 
+		to advance the presentation. These are provided both in a navigation bar at the top of the page, 
+		and as Navigation buttons at the bottom of the page. These Parameters determine which slide 
+		is displayed to the user. The user can Trigger a change in the scenes contained within the Slide 
+		show, by modifying these Parameters. 
+		</p>
+      </div>
+	</div>
+
+      <div class="container">
+	    <div class="col-lg-1 text-center" >
+        <a href="Slide1.html">
+        <button type="button" class="btn btn-default btn-lg ">
+        <span class="glyphicon glyphicon-menu-left" aria-hidden="true">Slide 1</span> 
+        </button></a>
+        </div>
+		
+		<div class="col-lg-11 text-center" >
+        <a href="Slide3.html">
+        <button type="button" class="btn btn-default btn-lg ">Slide 3
+        <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> 
+        </button></a>
+        </div>
+
+		
+      </div>
+
+
+
+    
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" 
+	crossorigin="anonymous"></script>
+	<!-- <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    
+    <script src="../../assets/js/docs.min.js"></script> -->
+  </body>
+</html>

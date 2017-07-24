@@ -1,0 +1,537 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="CS 498 Data Visualization Final Project Slide 1">
+    <meta name="author" content="Nischol Antao">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>CS498 Data Visualization Final Project Slide 1</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" 
+	crossorigin="anonymous">
+    <!-- Bootstrap theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" 
+	integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" 
+	crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="Slide1.css" rel="stylesheet"> 
+
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" 
+		  data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" >CS498 Final Project</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+			<li class="pagelinks"><a href="Introduction.html">Introduction</a></li>
+            <li class="pagelinks"><a href="Slide1.html">Slide 1</a></li>
+            <li class="pagelinks"><a href="Slide2.html">Slide 2</a></li>
+            <li class="pagelinks"><a href="Slide3.html">Slide 3</a></li>
+			<li class="pagelinks"><a href="Slide4.html">Slide 4</a></li>
+			<li class="pagelinks"><a href="Slide5.html">Slide 5</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container theme-showcase" role="main"> 
+
+      
+	  <div class="page-header"></div>
+      
+	  
+	  <div class="page-header">
+        <h1>Worldwide Impact (2010-2015)</h1>
+      </div>
+		<p> In 2015 an estimated 212 million cases of Malaria were recorded worldwide, which resulted
+			in an estimated 429,000 deaths. As staggering as these numbers are, significant   
+			progress has been made in curtailing both the number of incidences of infection, and the 
+			number of resulting casualties. Between 2010 and 2015 there has 
+			been a 13% reduction in the number of reported cases of malaria, and a 23% reduction in 
+			the number of deaths caused by this disease. The number of deaths specifically, have
+			consistently reduced every year, in that span. </p>
+		<p> Mouse Over the Line Graphs below to see the Data points associated with each Year </p> 
+	  
+	  
+	  
+	  <div class="container" id = "leftgraph" ></div>
+	  <div class="container" id = "leftcircle" ></div>
+	  <div class="container" id = "rightgraph" ></div>
+	  <div class="container" id = "rightcircle" ></div>
+	  <br>
+	  <script src="https://d3js.org/d3.v4.min.js"></script>
+
+<script>
+
+var svgwidth = 750;
+var svgheight = 600;
+
+var circlewidth = 120;
+
+// Create the Cases SVG Canvas
+
+var svg = d3.select("#leftgraph").append("svg")
+				.attr("width", svgwidth)
+				.attr("height", svgheight);
+
+// Create the Deaths SVG Canvas
+				
+var svg2 = d3.select("#rightgraph").append("g").append("svg")
+				.attr("width", svgwidth)
+				.attr("height", svgheight);
+
+// Create a SVG Canvas for the Circle Annotation for the Cases Graph
+				
+var circlegroup = d3.select("#leftcircle").append("g");
+
+var circle = circlegroup.append("svg")
+				.attr("width", circlewidth)
+				.attr("height", svgheight);
+				
+// Create a SVG Canvas for the Circle Annotation for the Deaths Graph				
+				
+var circle2group = d3.select("#rightcircle").append("g");
+var circle2 = circle2group.append("svg")
+				.attr("width", circlewidth)
+				.attr("height", svgheight);
+				
+// D3 Margin Convention, seems like a little overkill at first, but makes a lot of sense				
+// Allows you to use the rest of your code in terms of width and height
+				
+var margin = {top: 20, right: 100, bottom: 30, left: 40},
+    width = svgwidth - margin.left - margin.right,
+    height = svgheight - margin.top - margin.bottom;
+
+// Convert Time to the Year format
+	
+var parseTime = d3.timeParse("%Y")
+
+// Also a sliding scale to make sure that the proper year is select when mousing over the graph
+// We want to split this down the middle. 
+
+var bisectDate = d3.bisector(function(d) { return d.Year; }).left;
+
+// Time based scale on the x axis, and a linear scale on the scale for the Cases Chart, same for 
+// the Deaths Chart. 
+
+var x = d3.scaleTime().range([0, width]);
+var y = d3.scaleLinear().range([height, 0]);
+
+
+var x2 = d3.scaleTime().range([0, width]);
+var y2 = d3.scaleLinear().range([height, 0]);
+
+// Define our SVG Path, according to our x and y axis scales, for both the Cases Graph and Deaths 
+// graph
+
+var line = d3.line()
+    .x(function(d) { return x(d.Year); })
+    .y(function(d) { return y(d.Cases); });
+
+var line2 = d3.line()
+    .x(function(d) { return x2(d.Year); })
+    .y(function(d) { return y2(d.Deaths); });
+	
+
+// Add a additional group element to each of our SVG canvases, that we can use to display annotations  
+	
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var g2 = svg2.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");	
+	
+// Global Variable for our dataset, because who wants to pass data as arguments in javascript. Its
+// the Wild West of asynchronicity. Do what you will.   
+	
+var ByYearData = []
+
+// Sub Group elements for our annotations 
+
+var focus = g.append("g")
+        .attr("class", "focus")
+        .style("display", "none");
+
+var focus2 = g2.append("g")
+        .attr("class", "focus2")
+        .style("display", "none");
+
+// Load the data
+		
+d3.csv("MalariaCasesAndDeathsByYear.csv", function(error, data) {
+    if (error) throw error;
+
+	// Convert the data to the formats we need, year, int, int
+	
+    data.forEach(function(d) {
+      d.Year = parseTime(d.Year);
+      d.Cases = +d.Cases;
+	  d.Deaths = +d.Deaths;
+	});
+	
+	// Create our line charts, and our circle annotation chart
+	
+	ByYearData = data;
+	CreateViz();
+	DrawCircle(ByYearData);
+	
+	});
+
+	// Create Line Charts
+	
+	function CreateViz() {
+	
+	// Define the domain for our x and y scales, for both charts, based on the data set
+	
+    x.domain(d3.extent(ByYearData, function(d) { return d.Year; }));
+    y.domain([d3.min(ByYearData, function(d) { return d.Cases; }) / 1.08, d3.max(ByYearData, function(d) { return d.Cases; }) * 1.08]);
+
+	x2.domain(d3.extent(ByYearData, function(d) { return d.Year; }));
+    y2.domain([d3.min(ByYearData, function(d) { return d.Deaths; }) / 1.1, d3.max(ByYearData, function(d) { return d.Deaths; }) * 1.1]);
+
+	
+	// Sub Group for our x-axes
+	
+    g.append("g")
+        .attr("class", "axis axis--x")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x))
+      .append("text")
+        .attr("class", "axis-title")
+        .attr("x", svgwidth-150)
+		.attr("y", -12)
+        .attr("dy", ".71em")
+        .style("text-anchor", "right")
+        .attr("fill", "#5D6971")
+        .text("Year");
+		
+		
+	g2.append("g")
+        .attr("class", "axis axis--x2")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x2))
+      .append("text")
+        .attr("class", "axis-title2")
+        .attr("x", svgwidth-150)
+		.attr("y", -12)
+        .attr("dy", ".71em")
+        .style("text-anchor", "right")
+        .attr("fill", "#5D6971")
+        .text("Year");
+	
+	// Sub Group for our y-axes
+	
+    g.append("g")
+        .attr("class", "axis axis--y")
+        .call(d3.axisLeft(y).ticks(6).tickFormat(function(d) { return parseInt(d / 1000000) + "M"; }))
+      .append("text")
+        .attr("class", "axis-title")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .attr("fill", "#5D6971")
+        .text("Malaria Cases");
+
+    g2.append("g")
+        .attr("class", "axis axis--y2")
+        .call(d3.axisLeft(y2).ticks(6).tickFormat(function(d) { return parseInt(d / 1000) + "K"; }))
+      .append("text")
+        .attr("class", "axis-title2")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 6)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .attr("fill", "#5D6971")
+        .text("Malaria Deaths");
+
+	// Draw our SVG line paths	
+		
+    g.append("path")
+        .datum(ByYearData)
+        .attr("class", "line")
+        .attr("d", line);
+
+    g2.append("path")
+        .datum(ByYearData)
+        .attr("class", "line2")
+        .attr("d", line2);		
+		
+	// Add annotations to our line graphs
+		
+    focus.append("line")
+        .attr("class", "x-hover-line hover-line")
+        .attr("y1", 0)
+        .attr("y2", height);
+
+    focus2.append("line")
+        .attr("class", "x2-hover-line hover-line2")
+        .attr("y1", 0)
+        .attr("y2", height);		
+
+	// We need a dot, at the data point on the graph the user select
+		
+    focus.append("circle")
+        .attr("r", 5);
+
+	focus2.append("circle")
+        .attr("r", 5);	
+		
+	// We need to annotate the data point with the data value
+	
+    focus.append("text")
+        .attr("x", 10)
+      	.attr("dy", "-0.35em");
+
+    focus2.append("text")
+        .attr("x", 10)
+      	.attr("dy", "-0.35em");		
+
+	// Draw a line from the base of the x-axis to the point on the chart the user selects, based
+	// on a mouse over event. 
+	
+    svg.append("rect")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .attr("class", "overlay")
+        .attr("width", width)
+        .attr("height", height)
+        .on("mouseover", function() { focus.style("display", null); })
+        .on("mouseout", function() { focus.style("display", "none"); })
+        .on("mousemove", mousemove);
+	
+
+		
+    svg2.append("rect")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+        .attr("class", "overlay2")
+        .attr("width", width)
+        .attr("height", height)
+        .on("mouseover", function() { focus2.style("display", null); })
+        .on("mouseout", function() { focus2.style("display", "none"); })
+        .on("mousemove", mousemove2);
+
+	
+	
+	};	
+		
+	// Draw an additional annotation on the right side of each graph, to show the percentage reduction 
+	
+	function DrawCircle(data) {
+	
+	// Find the text we want to display
+	
+	var DeathsDiff = data[data.length-1].Deaths - data[0].Deaths;
+	var DeathsPercent = Math.abs(Math.round((DeathsDiff/data[0].Deaths)*100));
+	
+	var CasesDiff = data[data.length-1].Cases - data[0].Cases;
+	var CasesPercent = Math.abs(Math.round((CasesDiff/data[0].Cases)*100));
+	
+	// Draw our SVG circle
+	
+	circle.append("circle")
+	.attr("id", "CasesCircle")
+	.attr("cx", circlewidth/2)
+	.attr("cy", svgheight/2)
+	.attr("r", circlewidth/2.5)
+	;
+
+	// Add the text to the circle
+	// Adding text to SVG circles isnt easy, as far as centering it goes. Lots of trial and error
+
+	circle
+		.append("text")
+
+		.attr("x", circlewidth/2 -19 )
+		.attr("y", svgheight/2 -15)
+		.attr("dy", ".35em")
+		.text("Cases");
+	
+	circle
+		.append("text")
+
+		.attr("x", circlewidth/2 -15)
+		.attr("y", svgheight/2)
+		.attr("dy", ".35em")
+		.text("Down");
+
+	circle
+		.append("text")
+
+		.attr("x", circlewidth/2 -11)
+		.attr("y", svgheight/2 +19)
+		.attr("dy", ".35em")
+		.attr("fill", "#3072ff")
+		.attr("font-size", "16")
+		.text(CasesPercent+"%");	
+	
+	// Set the circle up to transition to be displayed after the page is loaded. So it catches the 
+	// users attention
+	
+	circle.style('opacity', 0)
+	.transition()
+    .delay(250)
+    .duration(2000)
+    .style('opacity', 1)
+		
+	
+	circle2.append("circle")
+	.attr("id", "DeathsCircle")
+	.attr("cx", circlewidth/2)
+	.attr("cy", svgheight/2)
+	.attr("r", circlewidth/2.5)
+	;	
+
+	circle2
+		.append("text")
+
+		.attr("x", circlewidth/2 -19 )
+		.attr("y", svgheight/2 -15)
+		.attr("dy", ".35em")
+		.text("Deaths");
+	
+	circle2
+		.append("text")
+
+		.attr("x", circlewidth/2 -15)
+		.attr("y", svgheight/2)
+		.attr("dy", ".35em")
+		.text("Down");
+
+	circle2
+		.append("text")
+
+		.attr("x", circlewidth/2 -11)
+		.attr("y", svgheight/2 +19)
+		.attr("dy", ".35em")
+		.attr("fill", "#ff2727")
+		.attr("font-size", "16")
+		.text(DeathsPercent+"%");	
+	
+	circle2.style('opacity', 0)
+	.transition()
+    .delay(250)
+    .duration(2000)
+    .style('opacity', 1);
+	
+	
+	};
+	
+	// Define our mouse move events to draw a line from the base of the x-axis to the data point
+	
+	
+    function mousemove() {
+      var x0 = x.invert(d3.mouse(this)[0]),
+          i = bisectDate(ByYearData, x0, 1),
+          d0 = ByYearData[i - 1],
+          d1 = ByYearData[i],
+          d = x0 - d0.Year > d1.Year - x0 ? d1 : d0;
+		  
+      focus.attr("transform", "translate(" + x(d.Year) + "," + y(d.Cases) + ")");
+      focus.select("text").text(function() { return d.Cases; });
+      focus.select(".x-hover-line").attr("y2", height - y(d.Cases));
+    };
+	
+    function mousemove2() {
+      var x0 = x2.invert(d3.mouse(this)[0]),
+          i = bisectDate(ByYearData, x0, 1),
+          d0 = ByYearData[i - 1],
+          d1 = ByYearData[i],
+          d = x0 - d0.Year > d1.Year - x0 ? d1 : d0;
+		  
+      focus2.attr("transform", "translate(" + x2(d.Year) + "," + y2(d.Deaths) + ")");
+      focus2.select("text").text(function() { return d.Deaths; });
+      focus2.select(".x2-hover-line").attr("y2", height - y2(d.Deaths));
+
+    };
+
+
+</script>
+</div>  <!-- /container -->
+	 
+	<div class = "container">
+	 <div class="page-header">
+        <h3>About the Visualization</h3>
+      </div>
+      <div class="well">
+        <p> This Visualization follows the Interactive Slide show hybrid structure. Slide 1 depicts a
+		<b>Scene </b> that conveys to the user, the impact of Malaria on the entire World Population. 
+		It shows the effect this disease has had on the population, in terms of the number of reported
+		cases, and the number of reported deaths, in the past 5 years. These are both displayed using
+		two separate line graphs. The Line Graphs are sized the same, have the same type of annotated
+		tool tip, and the follow the same set of triggers driven by the user interaction of mousing 
+		over the graph, thereby providing the user with a consistent visual structure when viewing 
+		this scene. The <b> Annotations </b> in Slide 1 are displayed when the user <b> Triggers </b>
+		a mouse over event. They show the number of reported cases of Malaria and number of reported 
+		deaths caused by Malaria, depending on which graph is moused over, and which year in the 
+		graph that the user mouses over. These annotations are removed, when the user triggers a 
+		mouses out event. The Line Graphs are also annotated with corresponding axes. 
+		Additional <b> Annotations </b> are the SVG circles that display the percentage
+		reduction in the number of malaria cases, and the number of malaria deaths over the displayed
+		time frame. The <b> Parameter </b> used in Slide 1 is the choice to animate the aforementioned 
+		SVG circles. This is <b> Triggered </b> by the page loading. This brings to the attention of the user, the percentage 
+		reductions in malaria related cases and deaths, that have been achieved during the displayed 
+		time frame. Additional <b> Parameters </b> in this Interactive Slide show are defined by the 
+		Slide Numbers that the User can click on, to advance the presentation. These are provided both 
+		in a navigation bar at the top of the page, and as Navigation buttons at the bottom of the page. 
+		These Parameters determine which slide is displayed to the user. The user can Trigger a 
+		change in the scenes contained within the Slide show, by modifying these Parameters. 
+		</p>
+      </div>
+	</div>
+
+      <div class="container">
+	    <div class="col-lg-1 text-center" >
+        <a href="Introduction.html">
+        <button type="button" class="btn btn-default btn-lg ">
+        <span class="glyphicon glyphicon-menu-left" aria-hidden="true">Intro</span> 
+        </button></a>
+        </div>
+		
+		<div class="col-lg-11 text-center" >
+        <a href="Slide2.html">
+        <button type="button" class="btn btn-default btn-lg ">Slide 2
+        <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> 
+        </button></a>
+        </div>
+
+		
+      </div>
+
+
+
+    
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" 
+	crossorigin="anonymous"></script>
+	<!-- <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    
+    <script src="../../assets/js/docs.min.js"></script> -->
+  </body>
+</html>

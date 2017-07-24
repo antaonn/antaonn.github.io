@@ -1,0 +1,399 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="CS 498 Data Visualization Final Project Slide 3">
+    <meta name="author" content="Nischol Antao">
+    <link rel="icon" href="../../favicon.ico">
+
+    <title>CS498 Data Visualization Final Project Slide 3</title>
+
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" 
+	integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" 
+	crossorigin="anonymous">
+    <!-- Bootstrap theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" 
+	integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" 
+	crossorigin="anonymous">
+
+    <!-- Custom styles for this template -->
+    <link href="Slide3.css" rel="stylesheet"> 
+
+	<style>
+	
+
+	
+	</style>
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" 
+		  data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" >CS498 Final Project</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+			<li class="pagelinks"><a href="Introduction.html">Introduction</a></li>
+            <li class="pagelinks"><a href="Slide1.html">Slide 1</a></li>
+            <li class="pagelinks"><a href="Slide2.html">Slide 2</a></li>
+            <li class="pagelinks"><a href="Slide3.html">Slide 3</a></li>
+			<li class="pagelinks"><a href="Slide4.html">Slide 4</a></li>
+			<li class="pagelinks"><a href="Slide5.html">Slide 5</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+<div class="container theme-showcase" role="main"> 
+
+      
+	  <div class="page-header"></div>
+      
+	  
+	  <div class="page-header">
+        <h1>Regional Improvements (2010-2015)</h1>
+      </div>
+		<p> Between 2010 and 2015, efforts to control the number of malaria cases and malaria deaths have been successful
+		in an all WHO regions. The number of cases in South East Asia in particular, have seen a remarkable reduction of
+		54%. This also corresponded to a decrease of 46% in the Malaria related deaths in this region. The Western Pacific
+		region showed the most improvement in controlling the number of malaria related deaths, with a reduction of 58%. 
+		The Eastern Mediterranean region has shown slow improvment in curtailing the number of Malaria cases, and Malaria
+		deaths, in this time period. This region has shown a reduction of 11% in the number of cases, and 6% in the number
+		of Deaths. 
+		</p>
+		<p> Use the User Input buttons below to view the Regional Percentage Reduction in Malaria Cases, or the Regional
+		Percentage Reduction in Malaria Deaths, for the 2010-2015 time period. 
+		</p>
+
+		<div class="page-header">
+			<form>
+				<label><input type="button" id ="casesdata" name="dataset" class="btn btn-primary" value="Regional Malaria Case Rate Reduction %"> </label>
+				<label><input type="button" id = "deathsdata" name="dataset" class="btn btn-danger" value="Regional Malaria Death Rate Reduction %"> </label>
+			</form>
+		</div>	
+
+		<div class = "container" id = "bargraph"></div>
+
+		
+		<script src="http://d3js.org/d3.v3.min.js"></script>
+
+		
+		<script type="text/javascript">
+
+			var MalariaData = [];
+
+			var svgwidth = 750;
+			var svgheight = 500;
+			var maxpercent = 75;
+
+			// D3 Margin Convention. Its handy but if you forget to transform translate , you get 
+			// killed on the axes. There's two hours of my life spent debugging, that im never going
+			// to get back. This language really ought to make drawing axes easier. 
+			
+			var margin = {top: 20, right: 50, bottom: 30, left: 50};
+			var width = svgwidth - margin.left - margin.right;
+			var height = svgheight - margin.top - margin.bottom;
+
+			// We define the x scale based on the data input, instead of hard coding it. 
+			
+			var xScale = d3.scale.ordinal()
+				.rangeRoundBands([20, width+20], .1);
+
+			// Load the Data
+			
+			d3.csv("MalariaCaseRateRedByRegion.csv", function(d) {
+			return {
+				Region : d.Region,
+				Value : +d.Value
+				
+			};
+		}, function(error, data) {
+			MalariaData = data;
+			xScale.domain(data.map(function(d){return d.Region}));
+			createVisualization();
+		});
+
+		
+		function createVisualization(){
+		
+			// Define our tool tip
+
+			var div = d3.select("body").append("div").attr("class", "toolTip");
+
+			// Color scale is the same as that of the previous slide. For consistency
+			
+			var colorRange = ["crimson", "forestgreen", "cornflowerblue", "gold", "lightsalmon"];
+			var color = d3.scale.ordinal()
+				.range(colorRange);
+						
+
+			var arrayLength = MalariaData.length; // length of dataset
+			var maxValue = d3.max(MalariaData, function(d) { return +d.Value;} ); // get maximum value of our dataset
+
+			// Need to define different y scales for the data and for the axis. F*****G D3
+			var yScale = d3.scale.linear()
+		    .domain([0, maxpercent])
+		    .range([0, height]);
+
+			var yAxisScale = d3.scale.linear()
+		    .domain([0, maxpercent])
+		    .range([height, 0]);
+
+			// Append our SVG canvas to the DOM
+			// I forgot to do the transform translate, and wasted several hours trying to debug 
+			// why my y axis got cut off... FML. 
+		
+			var svg = d3.select("body").select("#bargraph")
+			.append("svg")
+			.attr("width", svgwidth)
+			.attr("height", svgheight)
+			.append("g")
+			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");;
+
+			// This is all that D3 should be, an easy data join, and assigning attributes to your
+			// data elements. Instead we have to deal with no good axes, that spoil a perfectly good
+			// sunday. 
+			
+			var rect = svg.selectAll( "rect" )
+				.data(MalariaData)
+				.enter()
+				.append("rect")
+				.attr( "x", function(d,i){
+					return i * (width/arrayLength) +25; 
+				})
+				.attr( "y", function(d){
+					return height - yScale(+d.Value) ; 
+				})
+				.attr( "width", (width/arrayLength) -10 ) 
+				.attr( "height", function(d){
+					return yScale(+d.Value); 
+				})
+				.attr( "fill", function(d){return color(d.Region);});
+				
+				// Draw our Tool tip when needed. 
+				
+				rect.on("mousemove", function(d){
+					div.style("left", d3.event.pageX+10+"px");
+					div.style("top", d3.event.pageY-25+"px");
+					div.style("display", "inline-block");
+					div.html((d.Region)+"<br>"+(d.Value)+ "%");
+				});
+
+				rect.on("mouseout", function(d){
+				div.style("display", "none");
+				});					
+				
+				// Update the graph when the user clicks a button
+
+				d3.select("#deathsdata").on("click", function() {
+					d3.csv("MalariaDeathRateRedByRegion.csv", function(d) {
+						return {
+							Region : d.Region,
+							Value : +d.Value
+						};
+					}, function(error, data) {
+						MalariaData = data;
+						updateData();
+					});
+				});
+
+				// Dont forget to update it back to the original state, when the other button is
+				// clicked. 
+				
+				d3.select("#casesdata").on("click", function() {
+					d3.csv("MalariaCaseRateRedByRegion.csv", function(d) {
+						return {
+							Region : d.Region,
+							Value : +d.Value
+						};
+					}, function(error, data) {
+						MalariaData = data;
+						updateData();
+					});
+				});
+
+			
+				// Refresh the Graph with the new data
+			
+				function updateData() {
+				var maxValue = d3.max(MalariaData, function(d) { return +d.Value;} ); 
+				
+				var yScale = d3.scale.linear()
+				.domain([0, maxpercent])
+				.range([0, height]);
+				
+
+				svg.selectAll("rect")
+					.data(MalariaData)
+					.transition()
+					.attr("y", function(d){
+						
+						
+						return height - yScale(+d.Value); // Set y coordinate of rect using the y scale
+					})
+					.attr("height", function(d) {
+						
+						return yScale(+d.Value);
+					})			
+
+				svg.selectAll("rect")
+					.on("mousemove", function(d){
+					div.style("left", d3.event.pageX+10+"px");
+					div.style("top", d3.event.pageY-25+"px");
+					div.style("display", "inline-block");
+					div.html((d.Region)+"<br>"+(d.Value)+ "%");
+					});
+
+				svg.selectAll("rect")
+					.on("mouseout", function(d){
+					div.style("display", "none");
+					});					
+
+
+				}
+				
+			// Define and  Draw the Axes. 
+			
+			var yAxis = d3.svg.axis()
+			  .scale(yAxisScale)
+			  .orient("left")
+			  .ticks(5)
+			  .tickFormat( function(d) { return d ;} );
+
+			  
+			  
+			  
+			var xAxis = d3.svg.axis()
+			  .scale(xScale)
+			  .orient("bottom");
+			  
+
+			svg.append("g")
+			  .attr("class", "axis")
+			  .call(yAxis)
+			  
+			svg.append("g")  
+			  .append("text")
+			  .attr("class", "axis-title")
+			  .attr("transform", "translate(0,0) rotate(-90)")
+			  .attr("y", -30)
+			  .attr("x", -220)
+			  .attr("dy", ".35em")
+			  .style("text-anchor", "end")
+			  .text("Reduction %");
+
+
+			svg.append("g")
+			  .attr("class", "axis")
+			  .attr("transform", "translate(0," + height + ")")
+			  .call(xAxis)
+			  .append("text")
+			  .attr("class", "axis-title")
+			  .attr("x", width/2 - 10)
+			  .attr("y", margin.bottom-10)
+			  .attr("dy", ".71em")
+			  .style("text-anchor", "right")
+			  .text("Region");
+			
+
+
+			
+			};
+		
+			</script>
+		
+
+		
+		
+
+
+</div> <!-- Container -->
+	  
+	
+		
+	
+
+
+	 
+	<div class = "container">
+	 <div class="page-header">
+        <h3>About the Visualization</h3>
+      </div>
+      <div class="well">
+        <p> This Visualization follows the Interactive Slide show hybrid structure. Slide 3 depicts a
+		<b>Scene </b> that conveys to the user, the Improvements that have been made in each of the 
+		WHO regions, with respect to reducing the number of cases of malaria, and the number of 
+		deaths caused by Malaria.  The Visualization in this scene is a bar chart, where each region is 
+		represented by a uniquely colored bar. The colors of the bars in this chart, match the colors of
+		the circles in the previous chart, providing the user with a consistent visual structure when viewing 
+		this Interactive Slide show as a whole. The size of each of the bars in the chart represents the percentage reductions
+		that have been made in the number of Malaria Cases or the number of Malaria Deaths, depending on 
+		which chart the user has selected to view. The <b> Triggers </b> in this Visualization include the User's selection of a button, 
+		that determines whether they want to view a graph of the Percentage Reduction in Malaria Cases by Region, or a graph of the Percentage Reduction in Malaria Deaths
+		by Region. This selection drives a  <b> Parameter </b> that transitions between the two datasets, 
+		and animates the Visualization to display the graph that the user wishes to see. Additional <b>
+		Triggers </b> in this scene include Mouse Over and Mouse Out events. When  a user Mouses over
+		a bar on the graph, it displays a Tool Tip <b> Annotation </b> , that shows the Region selected, and the percentage of 
+		Reduction in Malaria cases/deaths in that Region. It also changes the opacity of the bar that 
+		was moused over. The Graph is also <b> Annotated </b> with axes to show the Regions on the x-axis, and the 
+		percentage reductions on the y-axis. Additional <b> Parameters </b> 
+		in this Interactive Slide show are defined by the Slide Numbers that the User can click on, 
+		to advance the presentation. These are provided both in a navigation bar at the top of the page, 
+		and as Navigation buttons at the bottom of the page. These Parameters determine which slide 
+		is displayed to the user. The user can Trigger a change in the scenes contained within the Slide 
+		show, by modifying these Parameters. 
+		</p>
+      </div>
+	</div>
+
+      <div class="container">
+	    <div class="col-lg-1 text-center" >
+        <a href="Slide2.html">
+        <button type="button" class="btn btn-default btn-lg ">
+        <span class="glyphicon glyphicon-menu-left" aria-hidden="true">Slide 2</span> 
+        </button></a>
+        </div>
+		
+		<div class="col-lg-11 text-center" >
+        <a href="Slide4.html">
+        <button type="button" class="btn btn-default btn-lg ">Slide 4
+        <span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> 
+        </button></a>
+        </div>
+
+		
+      </div>
+
+
+
+    
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+	integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" 
+	crossorigin="anonymous"></script>
+	<!-- <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    
+    <script src="../../assets/js/docs.min.js"></script> -->
+  </body>
+</html>
