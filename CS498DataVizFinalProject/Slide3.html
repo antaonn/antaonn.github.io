@@ -69,13 +69,13 @@
 	  <div class="page-header">
         <h1>Regional Improvements (2010-2015)</h1>
       </div>
-		<p> Between 2010 and 2015, efforts to control the number of malaria cases and malaria deaths have been successful
-		in an all WHO regions. The number of cases in South East Asia in particular, have seen a remarkable reduction of
+		<p> Between 2010 and 2015, efforts to control the number of malaria cases and malaria deaths were successful
+		in an all WHO regions. The number of cases in South East Asia in particular, saw a remarkable reduction of
 		54%. This also corresponded to a decrease of 46% in the Malaria related deaths in this region. The Western Pacific
 		region showed the most improvement in controlling the number of malaria related deaths, with a reduction of 58%. 
-		The Eastern Mediterranean region has shown slow improvment in curtailing the number of Malaria cases, and Malaria
-		deaths, in this time period. This region has shown a reduction of 11% in the number of cases, and 6% in the number
-		of Deaths. 
+		The Eastern Mediterranean region showed the slowest improvment in curtailing both the number of Malaria cases, and the number of Malaria
+		deaths. This region had a reduction of 11% in the number of cases, and 6% in the number
+		of Deaths.
 		</p>
 		<p> Use the User Input buttons below to view the Regional Percentage Reduction in Malaria Cases, or the Regional
 		Percentage Reduction in Malaria Deaths, for the 2010-2015 time period. 
@@ -242,6 +242,7 @@
 				svg.selectAll("rect")
 					.data(MalariaData)
 					.transition()
+					.duration(1500)
 					.attr("y", function(d){
 						
 						
@@ -343,7 +344,7 @@
 		represented by a uniquely colored bar. The colors of the bars in this chart, match the colors of
 		the circles in the previous chart, providing the user with a consistent visual structure when viewing 
 		this Interactive Slide show as a whole. The size of each of the bars in the chart represents the percentage reductions
-		that have been made in the number of Malaria Cases or the number of Malaria Deaths, depending on 
+		that have been made in the number of Malaria Cases/Malaria Deaths between 2010 and 2015, depending on 
 		which chart the user has selected to view. The <b> Triggers </b> in this Visualization include the User's selection of a button, 
 		that determines whether they want to view a graph of the Percentage Reduction in Malaria Cases by Region, or a graph of the Percentage Reduction in Malaria Deaths
 		by Region. This selection drives a  <b> Parameter </b> that transitions between the two datasets, 
