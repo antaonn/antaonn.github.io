@@ -72,8 +72,8 @@
 		Eastern Mediterranean Region, 1.2 Million cases reported in the Western Pacific Region, and
 		0.8 Million Cases reported in the Americas region. No cases were reported in the European
 		region. </p>
-		<p> In 2015, 90% of the Deaths caused by Malaria occurred in Africa,
-		7% of the Deaths caused by Malaria occurred in South East Asia, and 2% of the Deaths caused
+		<p> In 2015, 89% of the Deaths caused by Malaria occurred in Africa,
+		8% of the Deaths caused by Malaria occurred in South East Asia, and 2% of the Deaths caused
 		by Malaria occurred in the Eastern Mediterranean Region.
 		Malaria was responsible for a total of 394,000 deaths in Africa, 26200 deaths in South East
 		Asia, 7300 deaths in the Eastern Mediterranean Region, 1500 Deaths in the Western Pacific Region,
@@ -84,8 +84,8 @@
 		
 		<div class="page-header">
 			<form>
-				<label><input type="button" name="dataset" class="btn btn-primary" value="2015 Malaria Cases By Region (Millions)" > </label>
-				<label><input type="button" name="dataset" class="btn btn-danger" value="2015 Malaria Deaths by Region (Thousands)"> </label>
+				<label><input type="button" id= "casesdata" name="dataset" class="btn btn-primary" value="2015 Malaria Cases By Region (Millions)" > </label>
+				<label><input type="button" id="deathsdata" name="dataset" class="btn btn-danger" value="2015 Malaria Deaths by Region (Thousands)"> </label>
 			</form>
 		</div>	
 
@@ -101,138 +101,43 @@
 var WidthCircle =960;
 var HeightCircle = 300;
 
+var MalariaData = [];
+var select = "case"; 
+var Shift = 0;
 // Tool Tip
 	
 var div = d3.select("body").append("div").attr("class", "toolTip");
 
-// Data
+var colorRange = ["crimson", "forestgreen", "cornflowerblue", "gold", "lightsalmon"];
+var color = d3.scale.ordinal().range(colorRange);
 
-var Cases = [
-	{
-		"Region": "Africa",
-		"Value": 191,
-		"Color": "crimson",
-		"Units": "Million"
 
-		
-	},
-	{
-		"Region": "S.E Asia",
-		"Value": 14.4,
-		"Color": "forestgreen",
-		"Units": "Million"
-		
-	},
-	{
-		"Region": "E.Mediterranean",
-		"Value": 3.8,
-		"Color": "cornflowerblue",
-		"Units": "Million"
-		
-		
-	},
-	{
-		"Region": "W.Pacific",
-		"Value": 1.2,
-		"Color": "gold",
-		"Units": "Million"
-		
-		
-	},
-	{
-		"Region": "Americas",
-		"Value": 0.8,
-		"Color": "lightsalmon",
-		"Units": "Million"
-		
-		
-	},
-		
-	];
 
-var Deaths = [
-	{
-		"Region": "Africa",
-		"Value": 394,
-		"Color": "crimson",
-		"Units": "Thousand"
-		
-	},
-	{
-		"Region": "S.E Asia",
-		"Value": 26.2,
-		"Color": "forestgreen",
-		"Units": "Thousand"
-		
-	},
-	{
-		"Region": "E.Mediterranean",
-		"Value": 7.3,
-		"Color": "cornflowerblue",
-		"Units": "Thousand"
-		
-		
-	},
-	{
-		"Region": "W.Pacific",
-		"Value": 1.5,
-		"Color": "gold",
-		"Units": "Thousand"
-		
-		
-	},
-	{
-		"Region": "Americas",
-		"Value": 0.49,
-		"Color": "lightsalmon",
-		"Units": "Thousand"
-		
-		
-	},
-		
-	];
-
-// We default to showing cases data, if the user select deaths, we show that data insteaed	
+d3.csv("MalariaCasesByRegion.csv", function(d) {
+return {
+	Region : d.Region,
+	Value : +d.Value,
+	Units : d.Units
 	
-CreateCircleChartViz(Cases);
+};
+}, function(error, data) {
+MalariaData = data;
+CreateCircleChartViz();
+});
 
-// User click on input button updates the data
-	
-d3.selectAll("input")
-	.on("click", SelectCircleChartData);
 
-// Define which chart to draw	
-	
-function SelectCircleChartData()
-	{
-		var value = this.value;
-		if (value == "2015 Malaria Cases By Region (Millions)")
-		{
-			CreateCircleChartViz(Cases);
-			
-			
-		}
-		else
-		{
-			CreateCircleChartViz(Deaths);
-			
-		}
-		
-		
-		
-	};
 	
 	
-function CreateCircleChartViz(data)
+function CreateCircleChartViz()
 {
 
 	// Find out the total, so we can draw the area of circles proportionally
 
-	var sum = d3.sum(data, function(d){return +d.Value;})
+	var sum = d3.sum(MalariaData, function(d){return +d.Value;})
 
 	// Sneaky way to do a transition without D3 transition function
 	
-	d3.select("body").selectAll("svg").remove();
+	// d3.select("body").selectAll("svg").remove();
 	
 	// Draw our SVG circles
 	
@@ -243,7 +148,7 @@ function CreateCircleChartViz(data)
 	var g = svg.append("g")
 	
 	var circle = g.selectAll("circle")
-		.data(data)
+		.data(MalariaData)
 		.enter()
 		.append("circle")
 		.attr("class", "circlechart");
@@ -251,13 +156,15 @@ function CreateCircleChartViz(data)
 	// Position them such that they wont overlap on the x axis, and they are midway through the y
 	// The radius is proportional to the data	
 		
-	circle.attr("cx", function(d, i) {return (i-2)*(WidthCircle/data.length) + WidthCircle/2;})
+	circle.attr("cx", function(d, i) {return (i-2)*(WidthCircle/MalariaData.length) + WidthCircle/2;})
 		.attr("cy", HeightCircle/2)
-		.attr("r", function(d,i) {return (d.Value/sum) * (WidthCircle/(data.length*2)) * (5*i+1) ; })
-		.attr("fill", function(d) {return d.Color;});
+		.attr("r", function(d,i) {return (d.Value/sum) * (WidthCircle/(MalariaData.length*2)) * (6*i+1) ; })
+		.attr("fill", function(d) {return color(d.Region);});
 		
 	// Display a tool tip on a mouse over and remove it on a mouse out
-		
+	
+
+	
 	circle
 		.on("mousemove", function(d){
 			div.style("left", d3.event.pageX+10+"px");
@@ -273,17 +180,106 @@ function CreateCircleChartViz(data)
 
 	// Add text to annotate each circle
 	
-	var text = svg.selectAll("text")
-		.data(data)
+	var text = g.selectAll("text")
+		.data(MalariaData)
 		.enter()
 		.append("text")
 		.text(function(d) {return d.Region+": "+(d.Value);})
-		.attr("x", function(d, i) {return (i-2)*(WidthCircle/5) + (WidthCircle/2) - 32;})
-		.attr("y", HeightCircle/6);
+		.attr("x", function(d, i) {return (i-2)*(WidthCircle/5) + (WidthCircle/2) - 45;})
+		.attr("y", HeightCircle/8);
 		
 
+	// Update the graph when the user clicks a button
+
+	d3.select("#deathsdata").on("click", function() {
+		d3.csv("MalariaDeathsByRegion.csv", function(d) {
+			return {
+				Region : d.Region,
+				Value : +d.Value,
+				Units: d.Units
+			};
+		}, function(error, data) {
+			MalariaData = data;
+			if (select == "death")
+			{Shift = 0;}
+			else
+			{Shift = 1;}
+			select = "death";
+			updateData();
+		});
+	});		
 		
 
+	d3.select("#casesdata").on("click", function() {
+		d3.csv("MalariaCasesByRegion.csv", function(d) {
+			return {
+				Region : d.Region,
+				Value : +d.Value,
+				Units: d.Units
+			};
+		}, function(error, data) {
+			MalariaData = data;
+			if (select == "case")
+			{Shift = 0;}
+			else
+			{Shift = 1;}
+			select = "case";
+			updateData();
+		});
+	});				
+
+	
+		function updateData() {
+		
+		var Sum = d3.sum(MalariaData, function(d){return +d.Value;}); 
+		
+		//var xShift =  0;
+		var Bounce = 0;
+		
+		if (Shift == 1 )
+			{//xShift = Math.random() * (1 - 1) +1;
+			Bounce =1750;}
+		
+		svg.selectAll("text")
+		.data(MalariaData)
+		//.attr("x", function(d, i) {return (i-2)*(WidthCircle/5) + (WidthCircle/2) - 32 + xShift;})
+		.text(function(d) {return d.Region+": "+(d.Value);});
+		
+		console.log(MalariaData);
+
+		svg.selectAll("circle")
+			.data(MalariaData)
+			.transition()
+			.ease("elastic")
+			.duration(Bounce)
+			.attr("r", function(d,i) {return (d.Value/Sum) * (WidthCircle/(MalariaData.length*2)) * (6*i+1) ; })
+			.attr("cx", function(d, i) {return ((i-2)*(WidthCircle/MalariaData.length) + WidthCircle/2)   ;});
+			//.attr("cy", HeightCircle/2 - Math.random() * (12 - 1) +1  );
+			
+		svg.selectAll("circle")
+			.on("mousemove", function(d){
+			div.style("left", d3.event.pageX+10+"px");
+			div.style("top", d3.event.pageY-25+"px");
+			div.style("display", "inline-block");
+			div.html((d.Region)+"<br>"+(d.Value)+"<br>"+(d.Units));
+			});
+
+		svg.selectAll("circle")
+			.on("mouseout", function(d){
+			div.style("display", "none");
+			
+			
+
+		
+		});		
+	
+						
+
+
+		};	
+	
+	
+	
 };
 
 </script>
@@ -312,7 +308,10 @@ function CreateCircleChartViz(data)
 		Deaths. The <b> Triggers </b> in this Visualization include the User's selection of a button 
 		that determines whether they want to view a graph of the Malaria Cases by Region, or a graph of Malaria Deaths
 		by Region. This selection drives a  <b> Parameter </b> that transitions between the two datasets, 
-		and animates the Visualization to display the graph that the user wishes to see. Additional <b>
+		and animates the Visualization to display the graph that the user wishes to see. Since the 
+		proportion of cases from region to region, and deaths from region to region are very similar, the animation 
+		was chosen to include an elastic ease, to illustrate to the
+		user that the data did in fact change. Additional <b>
 		Triggers </b> in this scene include Mouse Over and Mouse Out events. When  a user Mouses over
 		a circle on the graph, it displays a Tool Tip <b> Annotation </b> , that shows the number of 
 		reported cases/deaths in a region. It also changes the opacity of the circle that is moused over.
